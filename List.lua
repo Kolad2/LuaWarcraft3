@@ -1,5 +1,3 @@
-dofile ("tools.lua")
-
 ---List
 function List()
     ---@type boolean
@@ -99,5 +97,3 @@ function ListTest(list)
     print(list.error_value)
     list.error_value = 1
 end
-
-lis1 = List()
