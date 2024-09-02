@@ -45,3 +45,13 @@ function debug_tools(self, meta)
         print("Ошибка: попытка доступа к несуществующему ключу: " .. key)
     end
 end
+
+function table_max(t)
+    local max = t[1]  -- Предполагаем, что первый элемент - максимальный
+    for i = 2, #t do
+        if t[i] > max then
+            max = t[i]
+        end
+    end
+    return max
+end
