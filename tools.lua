@@ -9,7 +9,7 @@ function range(len)
     local index = -1
     self.reset = function() index = -1 end
     
-    function self.next()
+    function self:next()
         index = index + 1 
         if index < self.len then
             return index
@@ -21,6 +21,9 @@ function range(len)
     local mt = {}
     mt.__call = self.next
     mt.__type = function() return "range" end
+    mt.__gc = function()
+        index = nil
+    end
     return setmetatable(self, mt)
 end
 

@@ -2,10 +2,9 @@
 function List()
     ---@type boolean
     local DEBUG_MODE = true
-
     ---@type table
     local self = {}
-
+    self._array = {}
     self.len = 0
 
     function self.append(item)
