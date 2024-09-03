@@ -1,4 +1,6 @@
 ---List
+---@param table? table
+---@return table
 function List(table)
     ---@type table
     local self = {}
@@ -86,6 +88,6 @@ function List(table)
     function meta:__len()
         return #self._array
     end
-    
+
     return setmetatable(self, meta)
 end

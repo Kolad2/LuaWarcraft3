@@ -25,12 +25,18 @@ function debug_tools(self, meta)
 end
 
 
-function table_max(t)
-    local max = t[1]  -- Предполагаем, что первый элемент - максимальный
-    for i = 2, #t do
-        if t[i] > max then
-            max = t[i]
+function table_max(table)
+    if #table == 0 then return nil end
+    local max = table[1]  -- Предполагаем, что первый элемент - максимальный
+    if #table == 1 then return max end
+    for i = 2, #table do
+        if table[i] > max then
+            max = table[i]
         end
     end
     return max
 end
+
+
+
+

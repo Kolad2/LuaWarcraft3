@@ -1,46 +1,66 @@
+---Set
+---@return table
 function Set()
-    local self = List()
-    meta = getmetatable(self)
-    setmetatable(self, {})
-    
-    local index_table = {}
-    local super_append = self.append
+    local self = List() ---@type table
+    local meta = getmetatable(self)
+    setmetatable(self, nil)
+    self.super_append = self.append
+    self.super_pop_swap = self.pop_swap
 
-    function self.append(elem)
-        if index_table[elem] then
+    self._index_table = {} ---@type table
+
+    ---@param item any
+    ---@private
+    function self:_clear_index(item)
+        self._index_table[item] = nil
+    end
+
+    ---@param item any
+    ---@private
+    function self:_get_index(item)
+        return self._index_table[item]
+    end
+
+    ---@param item any
+    ---@param idx number|nil
+    ---@private
+    function self:_set_index(item, idx)
+        self._index_table[item] = idx
+    end
+
+    ---@param item any
+    function self:append(item)
+        if self:_get_index(item) then
             print("Ошибка: элемент уже существовал")
             return false
         end
-        index_table[elem] = self.len
-        super_append(elem)
+        self:_set_index(item, #self + 1)
+        self:super_append(item)
         return true
     end
     self.add = self.append
-    
-    local super_pop_swap = self.pop_swap
-    function self.pop_swap(idx)
-        local item = super_pop_swap(idx)
+
+    ---@param idx number
+    ---@return boolean
+    function self:pop_swap(idx)
+        local item = self:super_pop_swap(idx)
         if item~=nil then
-            if self[idx]~=nil then index_table[self[idx]] = idx end
-            index_table[item] = nil
+            if self[idx]~=nil then self:_set_index(self[idx], idx) end
+            self:_clear_index(item)
             return true
         end
         return false
     end
-    
-    function self.remove(elem)
-        local idx = index_table[elem]
+
+    ---@param item any
+    function self:remove(item)
+        local idx = self:_get_index(item)
         if not idx then
             print("Ошибка: элемент не существовал")
             return false
         end
-        return self.pop_swap(idx)
+        return self:pop_swap(idx)
     end
-    
-    if DEBUG_MODE then
-        debug_tools(self, meta)
-    end
-    
-    print("Set() inited")
+
     return setmetatable(self, meta)
 end
