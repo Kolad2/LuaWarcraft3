@@ -58,7 +58,7 @@ function List(table)
 
     function self:max()
         if #self == 0 then return nil end
-        local max = self._array[1]  -- Предполагаем, что первый элемент - максимальный
+        local max = self[1]  -- Предполагаем, что первый элемент - максимальный
         if #self == 1 then return max end
         for i = 2, #self do
             if self[i] > max then

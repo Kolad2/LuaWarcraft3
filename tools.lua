@@ -24,8 +24,9 @@ function debug_tools(self, meta)
     end
 end
 
+tools = {}
 
-function table_max(table)
+function tools.max(table)
     if #table == 0 then return nil end
     local max = table[1]  -- Предполагаем, что первый элемент - максимальный
     if #table == 1 then return max end
