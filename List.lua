@@ -1,98 +1,91 @@
 ---List
-function List()
-    ---@type boolean
-    local DEBUG_MODE = true
+function List(table)
     ---@type table
     local self = {}
-    self._array = {}
-    self.len = 0
+    self._array = table or {}
 
-    function self.append(item)
-        self[self.len] = item
-        self.len = self.len + 1
+    function self:check_bounds(idx)
+        return  idx > 0 and idx <= #self
     end
-    
-    function self.pop_swap(idx)
-        if idx >= self.len then
-            print("Ошибка")
+
+    function self:append(item)
+        if item == nil then
+            print("Warning: попытка добавть nil в List")
+            return
+        end
+        self[#self + 1] = item
+    end
+
+    function self:pop_back()
+        self[#self] = nil
+    end
+
+    function self:pop_swap(idx)
+        if not self:check_bounds(idx) then
+            print("Ошибка: индекс в pop_swap(idx) превышает размер массива")
             return nil
         end
         local item = self[idx]
-        local len = self.len - 1
-        self[idx] = self[len]
-        self[len] = nil
-        self.len = len
+        self[idx] = self[#self]
+        self:pop_back()
         return item
     end
     
-    function self.pop(idx)
-        for i = idx, self.len-2 do
+    function self:pop(idx)
+        if not self:check_bounds(idx) then
+            print("Ошибка: индекс в pop(idx) превышает размер массива")
+            return nil
+        end
+        for i = idx, #self-1 do
             self[i] = self[i+1]
-        end        
-        self[self.len] = nil
-        self.len = self.len - 1
+        end
+        self:pop_back()
     end
-    
-    function self.get_random_index()
-        if self.len == 0 then return nil end
-        return math.random(0, self.len-1)
+
+    ---@return number
+    function self:get_random_index()
+        if #self == 0 then return nil end
+        return math.random(1, #self)
     end
-    
-    function self.get_random()
-        local idx = self.get_random_index()
+
+    function self:get_random()
+        local idx = self:get_random_index() ---@type number
         if idx == nil then return nil end
         return self[idx]
     end
-    
-    local meta = {}
-    if DEBUG_MODE then
-        debug_tools(self, meta)
-    end
-    
-    return setmetatable(self, meta)
-end
 
-
-function iterator(list)
-    local self = {}
-    self.index = 0
-    self.list = list
-    
-    function self.next()
-        if self.index < self.list.len then
-            local item = self.list[self.index]
-            self.index = self.index + 1
-            return item
+    function self:max()
+        if #self == 0 then return nil end
+        local max = self._array[1]  -- Предполагаем, что первый элемент - максимальный
+        if #self == 1 then return max end
+        for i = 2, #self do
+            if self[i] > max then
+                max = self[i]
+            end
         end
-        self.index = 0
-        return nil
+        return max
     end
-    
-    local meta = {}
-    meta.__call = self.next
-    return setmetatable(self, meta)
-end
 
-function ListTest(list)
-    print("Тест списка")
-    iterator1 = iterator(list)
-    print("Тест итератора списка 1")
-    for elem in iterator1.next do
-        print(elem)
+    local meta = {}
+    function meta:__newindex(key, value)
+        if type(key) == "number" then
+            rawset(self._array, key, value)
+        end
+    end
+
+    -- перенаправление self[i] в #self._array[i]
+    function meta:__index(key)
+        if type(key) ~= "number" then return rawget(self, key) end
+        if key > 0 and key <= #self then
+            return rawget(self._array, key)
+        end
+        print("Ошибка: ключ к списку выходит за рамки его размера")
+    end
+
+    -- перенаправление #self в #self._array
+    function meta:__len()
+        return #self._array
     end
     
-    iterator1 = iterator(list)
-    print("Тест итератора списка 2")
-    for elem in iterator1 do
-        print(elem)
-    end
-    
-    print("Тест итератора списка 3")
-    for elem in iterator(list) do
-        print(elem)
-    end
-    
-    print("Следующие 2 ошибки контролируеммые")
-    print(list.error_value)
-    list.error_value = 1
+    return setmetatable(self, meta)
 end
